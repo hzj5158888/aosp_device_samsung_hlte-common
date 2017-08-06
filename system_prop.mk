@@ -56,6 +56,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.storage_manager.enabled=true
 
+# Storage
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sys.sdcardfs=true
+
 # Sensors
 PRODUCT_PROPERTY_OVERRIDES += \
     debug.sensors=1

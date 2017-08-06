@@ -151,7 +151,6 @@ on post-fs-data
     chmod 660 /sys/class/flash/flash/flash_power
 
 on boot
-    insmod /system/lib/modules/adsprpc.ko
 
 # MUIC
     chown radio system /sys/class/sec/switch/usb_sel
@@ -161,9 +160,6 @@ on boot
     chown radio system /sys/class/sec/switch/apo_factory
     chown system radio /sys/class/sec/switch/adc
     chown system radio /sys/class/sec/switch/otg_test
-
-# sii8620 MHL adapter
-    chown system system /sys/class/input/input0/enabled
 
 # Fingerprint
     mkdir /dev/validity 0775 system system
@@ -571,11 +567,11 @@ service qseecomd /system/bin/qseecomd
 service mpdecision /system/bin/mpdecision --avg_comp
    class main
    user root
-   group system
+   group root readproc
    disabled
 
 service thermal-engine /system/bin/thermal-engine
-   class core
+   class main
    user root
    socket thermal-send-client stream 0666 system system
    socket thermal-recv-client stream 0660 system system
@@ -583,7 +579,7 @@ service thermal-engine /system/bin/thermal-engine
    group root
 
 service time_daemon /system/bin/time_daemon
-   class late_start
+   class main
    user root
    group root
 

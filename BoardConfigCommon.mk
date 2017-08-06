@@ -35,7 +35,7 @@ TARGET_KRAIT_BIONIC_BBTHRESH := 64
 TARGET_KRAIT_BIONIC_PLDSIZE := 64
 
 # Kernel
-BOARD_CUSTOM_BOOTIMG_MK := $(LOCAL_PATH)/mkbootimg.mk
+BOARD_CUSTOM_BOOTIMG_MK := hardware/samsung/mkbootimg.mk
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=null androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x3F androidboot.bootdevice=msm_sdcc.1
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
@@ -49,7 +49,6 @@ TARGET_KERNEL_SELINUX_CONFIG := selinux_defconfig
 TARGET_KERNEL_VARIANT_CONFIG := msm8974_sec_hlte_eur_defconfig
 TARGET_KERNEL_SOURCE := kernel/samsung/hlte-cm
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
-TARGET_HW_DISK_ENCRYPTION := false
 
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
@@ -60,7 +59,6 @@ AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
 AUDIO_FEATURE_ENABLED_HWDEP_CAL := true
 AUDIO_FEATURE_ENABLED_LOW_LATENCY_CAPTURE := true
 TARGET_USES_QCOM_MM_AUDIO := true
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
 QCOM_ACDB_ENABLED := true
 QCOM_ANC_HEADSET_ENABLED := true
 QCOM_AUDIO_FORMAT_ENABLED := true
@@ -106,9 +104,6 @@ BOARD_EGL_CFG := device/samsung/hlte-common/configs/egl.cfg
 
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
-
-# NFC
-#BOARD_NFC_HAL_SUFFIX := $(TARGET_BOARD_PLATFORM)
 
 # Power HAL
 TARGET_POWERHAL_VARIANT := qcom

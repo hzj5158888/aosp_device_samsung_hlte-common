@@ -60,12 +60,17 @@ PRODUCT_PACKAGES += \
     com.dsi.ant.antradio_library \
     libantradio
 
-# test apps
+# qcom apps
 PRODUCT_PACKAGES += \
+    Updater \
+    Protips \
+    Gallery2 \
+    Gallery4 \
     VideoEditor \
     BluetoothExt \
-    AccountAndSyncSettings \
-    AlarmProvider
+    AlarmProvider \
+    CellBroadcastReceiver \
+    AccountAndSyncSettings
 
 # Audio
 PRODUCT_COPY_FILES += \
@@ -86,10 +91,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     SamsungDoze
 
-# GPS
-PRODUCT_PACKAGES += \
-    gps.msm8974
-
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/gps/etc/gps.conf:/system/etc/gps.conf \
     $(LOCAL_PATH)/gps/etc/flp.conf:/system/etc/flp.conf \
@@ -101,6 +102,8 @@ PRODUCT_PACKAGES += \
     camera.msm8974 \
     libstlport \
     libxml2 \
+    camera \
+    camera2 \
     SnapdragonCamera
 
 # codeaurora
@@ -132,6 +135,16 @@ PRODUCT_PACKAGES += \
     gzip \
     minigzip \
     libunz
+
+# ks
+PRODUCT_PACKAGES += \
+    ks \
+    qcks \
+    efsks
+
+# lib_nl
+PRODUCT_PACKAGES += \
+    libnl_2
 
 # Recorder
 PRODUCT_PACKAGES += \
@@ -263,7 +276,7 @@ PRODUCT_PACKAGES += \
 
 # set default USB configuration
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=adb,mtp
+    persist.sys.usb.config=mtp
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf \

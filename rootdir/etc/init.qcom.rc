@@ -33,6 +33,9 @@ on early-init
 
     export LD_SHIM_LIBS /system/lib/libril.so|libril_shim.so
 
+    mount debugfs debugfs /sys/kernel/debug
+    chmod 0755 /sys/kernel/debug
+
     # efs 
     chmod 0660 /dev/block/mmcblk0p11
     chown system system /dev/block/mmcblk0p11
@@ -125,7 +128,9 @@ on early-init
     write /sys/module/msm_pm/modes/cpu1/retention/idle_enabled 1
     write /sys/module/msm_pm/modes/cpu2/retention/idle_enabled 1
     write /sys/module/msm_pm/modes/cpu3/retention/idle_enabled 1
-
+    write /sys/module/msm_pm/modes/cpu1/retention/suspend_enabled 1
+    write /sys/module/msm_pm/modes/cpu2/retention/suspend_enabled 1
+    write /sys/module/msm_pm/modes/cpu3/retention/suspend_enabled 1
     write /sys/module/msm_thermal/core_control/enabled 0
 
     write /sys/devices/system/cpu/cpu1/online 1
@@ -145,7 +150,7 @@ on early-init
     write /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq 1958400
     write /sys/devices/system/cpu/cpufreq/interactive/io_is_busy 1
 
-    write /sys/module/msm_thermal/core_control/enabled 0
+    write /sys/module/msm_thermal/core_control/enabled 1
 
     # cpu-boost
     # Configure the cpu-boost module
@@ -158,22 +163,7 @@ on early-init
     chown system system /sys/module/cpu_boost/parameters/input_boost_ms
     chmod 664 /sys/module/cpu_boost/parameters/input_boost_ms
 
-    write /sys/class/devfreq/qcom,cpubw.34/governor "msm_cpufreq"
     write /sys/class/kgsl/kgsl-3d0/devfreq/governor msm-adreno-tz
-
-    #Simple GPU Algorithm
-    write /sys/module/simple_gpu_algorithm/parameters/simple_gpu_activate 1
-    write /sys/module/simple_gpu_algorithm/parameters/simple_ramp_threshold 4000
-    write /sys/module/simple_gpu_algorithm/parameters/simple_laziness 6 
-
-    #Intelliplug
-    #write /sys/module/intelli_plug/parameters/cpu_nr_run_threshold 853  
-    #write /sys/module/intelli_plug/parameters/intelli_plug_active 1      
-    #write /sys/module/intelli_plug/parameters/nr_run_hysteresis 7                         
-    #write /sys/module/intelli_plug/parameters/nr_run_profile_sel 0                          
-    #write /sys/module/intelli_plug/parameters/touch_boost_active 1    
-    #write /sys/module/intelli_plug/parameters/screen_off_max
-    #write /sys/module/intelli_plug/parameters/nr_possible_cores
 
 on init
     # Set permissions for persist partition
@@ -199,6 +189,7 @@ on early-boot
     chown system system /sys/class/graphics/fb1/format_3d
 
 on boot
+    mount debugfs /sys/kernel/debug /sys/kernel/debug
 
     chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
@@ -255,8 +246,8 @@ on boot
 
     # Assign TCP buffer thresholds to be ceiling value of technology maximums
     # Increased technology maximums should be reflected here.
-    write /proc/sys/net/core/rmem_max  2097152
-    write /proc/sys/net/core/wmem_max  2097152
+    write /proc/sys/net/core/rmem_max  8388608
+    write /proc/sys/net/core/wmem_max  8388608
 
     #To allow interfaces to get v6 address when tethering is enabled
     write /proc/sys/net/ipv6/conf/rmnet0/accept_ra 2
@@ -267,18 +258,7 @@ on boot
     write /proc/sys/net/ipv6/conf/rmnet5/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet_usb0/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb1/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb2/accept_ra 2
-    write /proc/sys/net/ipv6/conf/rmnet_usb3/accept_ra 2
 
     # To prevent out of order acknowledgements from making
     # connection tracking to treat them as not belonging to
@@ -287,11 +267,6 @@ on boot
     # connections on high-throughput links get dropped when
     # an ack packet comes out of order
     write /proc/sys/net/netfilter/nf_conntrack_tcp_be_liberal 1
-
-    # Enable adaptive LMK and set vmpressure_file_min
-    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 1
-    write /sys/module/lowmemorykiller/parameters/vmpressure_file_min 53059
-    write /sys/module/lowmemorykiller/parameters/debug_level 0
 
 # msm specific files that need to be created on /data
 on post-fs-data
@@ -433,6 +408,14 @@ on post-fs-data
     chmod 0600 /dev/btlock
     chown bluetooth bluetooth /dev/btlock
 
+    # Power Hal Permissions
+    chown system system /sys/class/input/input2/enabled
+    chown system system /sys/class/input/input3/enabled
+    chown system system /sys/class/input/input18/enabled
+    chmod 0660 /sys/class/input/input2/enabled
+    chmod 0660 /sys/class/input/input3/enabled
+    chmod 0660 /sys/class/input/input18/enabled
+
     # Vibrator
     chmod 0644 /sys/class/timed_output/vibrator/pwm_value
     chown root system /sys/class/timed_output/vibrator/pwm_value
@@ -521,6 +504,7 @@ service irsc_util /system/bin/irsc_util "/etc/sec_config"
 service rmt_storage /system/bin/rmt_storage
     class core
     user root
+    group system wakelock
 
 on property:ro.boot.emmc=true
     start rmt_storage
