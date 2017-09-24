@@ -199,14 +199,6 @@ int getAvailableNetworksResponse(int slotId,
                                 int responseType, int serial, RIL_Errno e, void *response,
                                 size_t responselen);
 
-int startNetworkScanResponse(int slotId,
-                             int responseType, int serial, RIL_Errno e, void *response,
-                             size_t responselen);
-
-int stopNetworkScanResponse(int slotId,
-                            int responseType, int serial, RIL_Errno e, void *response,
-                            size_t responselen);
-
 int startDtmfResponse(int slotId,
                      int responseType, int serial, RIL_Errno e, void *response,
                      size_t responselen);
@@ -541,14 +533,6 @@ int setSimCardPowerResponse(int slotId,
                               int responseType, int serial, RIL_Errno e,
                               void *response, size_t responselen);
 
-int startKeepaliveResponse(int slotId,
-                           int responseType, int serial, RIL_Errno e,
-                           void *response, size_t responselen);
-
-int stopKeepaliveResponse(int slotId,
-                          int responseType, int serial, RIL_Errno e,
-                          void *response, size_t responselen);
-
 void acknowledgeRequest(int slotId, int serial);
 
 int radioStateChangedInd(int slotId,
@@ -717,14 +701,6 @@ int modemResetInd(int slotId,
                   int indicationType, int token, RIL_Errno e, void *response,
                   size_t responselen);
 
-int networkScanResultInd(int slotId,
-                         int indicationType, int token, RIL_Errno e, void *response,
-                         size_t responselen);
-
-int keepaliveStatusInd(int slotId,
-                       int indicationType, int token, RIL_Errno e, void *response,
-                       size_t responselen);
-
 int sendRequestRawResponse(int slotId,
                            int responseType, int serial, RIL_Errno e,
                            void *response, size_t responseLen);
@@ -732,14 +708,6 @@ int sendRequestRawResponse(int slotId,
 int sendRequestStringsResponse(int slotId,
                                int responseType, int serial, RIL_Errno e,
                                void *response, size_t responseLen);
-
-int setCarrierInfoForImsiEncryptionResponse(int slotId,
-                                            int responseType, int serial, RIL_Errno e,
-                                            void *response, size_t responseLen);
-
-int carrierInfoForImsiEncryption(int slotId,
-                        int responseType, int serial, RIL_Errno e,
-                        void *response, size_t responseLen);
 
 pthread_rwlock_t * getRadioServiceRwlock(int slotId);
 

@@ -25,6 +25,7 @@
 #include <hidl/HidlTransportSupport.h>
 #include <utils/SystemClock.h>
 #include <inttypes.h>
+#include <cutils/properties.h>
 
 #define INVALID_HEX_CHAR 16
 

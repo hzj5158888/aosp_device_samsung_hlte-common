@@ -5566,6 +5566,8 @@ typedef struct {
   */
 #define RIL_REQUEST_SET_SIM_CARD_POWER 140
 
+#define RIL_OEM_REQUEST_BASE 10000
+
 /***********************************************************************/
 
 /**
@@ -5587,7 +5589,6 @@ typedef struct {
  **********************************************************/
 
 #define SAMSUNG_REQUEST_BASE 10000
-#define RIL_OEM_REQUEST_BASE 10000
 #define RIL_REQUEST_DIAL_EMERGENCY_CALL 10001
 #define RIL_REQUEST_CALL_DEFLECTION 10002
 #define RIL_REQUEST_MODIFY_CALL_INITIATE 10003
