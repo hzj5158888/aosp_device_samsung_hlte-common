@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# sdclang
+-include device/qcom/common/sdclang/common.mk
+
 # inherit from common msm8974
 -include device/samsung/msm8974-common/BoardConfigCommon.mk
 
@@ -22,6 +25,9 @@ TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
 
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := MSM8974
+
+# only build bootimg
+TARGET_BOOTIMG_SIGNED := true
 
 # krait configs
 TARGET_USE_KRAIT_PLD_SET := true
@@ -40,11 +46,10 @@ BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02900000 --tags_offset 0x02700000 --dt device/samsung/hlte-common/dt.img
 LZMA_RAMDISK_TARGETS := recovery
-TARGET_KERNEL_CONFIG := msm8974_sec_defconfig
+TARGET_KERNEL_CONFIG := lineage_hlte_bcm2079x_defconfig
 TARGET_KERNEL_SELINUX_CONFIG := selinux_defconfig
-TARGET_KERNEL_VARIANT_CONFIG := msm8974_sec_hlte_eur_defconfig
 TARGET_KERNEL_SOURCE := kernel/samsung/hlte-cm
-KERNEL_TOOLCHAIN := $(ANDROID_BUILD_TOP)/prebuilts/gcc/$(HOST_OS)-x86/arm/arm-linux-androideabi-7.x/bin
+KERNEL_TOOLCHAIN := $(ANDROID_BUILD_TOP)/prebuilts/gcc/$(HOST_OS)-x86/arm/arm-linux-androideabi-4.9/bin
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
 
 # ANT+
@@ -55,17 +60,6 @@ QCOM_CSDCLIENT_ENABLED := false
 AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
 AUDIO_FEATURE_ENABLED_HWDEP_CAL := true
 AUDIO_FEATURE_ENABLED_LOW_LATENCY_CAPTURE := true
-TARGET_USES_QCOM_MM_AUDIO := true
-QCOM_ACDB_ENABLED := true
-QCOM_ANC_HEADSET_ENABLED := true
-QCOM_AUDIO_FORMAT_ENABLED := true
-QCOM_PROXY_DEVICE_ENABLED := true
-QCOM_OUTPUT_FLAGS_ENABLED := true
-QCOM_USBAUDIO_ENABLED := true
-QCOM_ADSP_SSR_ENABLED := true
-QCOM_FLUENCE_ENABLED := true
-QCOM_TUNNEL_LPA_ENABLED := true
-USE_CUSTOM_AUDIO_POLICY := 1
 
 # Bluetooth
 BOARD_CUSTOM_BT_CONFIG := $(LOCAL_PATH)/bluetooth/vnd_hlte.txt
@@ -82,14 +76,11 @@ USE_DEVICE_SPECIFIC_CAMERA := true
 # Added to indicate that protobuf-c is supported in this build
 PROTOBUF_SUPPORTED := false
 
-# Control flag between KM versions
-TARGET_HW_KEYMASTER_V03 := false
-
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := false
 
 # DEXPREOPT
-WITH_DEXPREOPT := true
+WITH_DEXPREOPT := false
 
 # RIL
 BOARD_RIL_CLASS := ../../../device/samsung/hlte-common/ril
@@ -108,8 +99,12 @@ BOARD_EGL_CFG := device/samsung/hlte-common/configs/egl.cfg
 SF_VSYNC_EVENT_PHASE_OFFSET_NS := 5000000
 VSYNC_EVENT_PHASE_OFFSET_NS := 7500000
 
+# Some of our vendor libs have text relocations
+TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS:= true
+TARGET_NEEDS_PLATFORM_TEXTRELS := \
+     $(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS)
+
 # Legacy BLOB Support
-TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
 
 # Partitions
@@ -133,11 +128,8 @@ TARGET_RECOVERY_DENSITY := xhdpi
 TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/rootdir/etc/fstab.qcom
 
 # SELinux
-#-include device/qcom/sepolicy/sepolicy.mk
-#BOARD_SEPOLICY_DIRS += device/samsung/hlte-common/sepolicy-aosp
-
-# SECCOMP Extension
-BOARD_SECCOMP_POLICY += device/qcom/common/seccomp
+-include device/qcom/sepolicy/sepolicy.mk
+BOARD_SEPOLICY_DIRS += device/samsung/hlte-common/sepolicy
 
 # Sensors
 TARGET_NO_SENSOR_PERMISSION_CHECK := true

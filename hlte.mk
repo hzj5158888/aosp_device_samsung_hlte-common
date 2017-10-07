@@ -29,6 +29,11 @@ TARGET_BOARD_PLATFORM := msm8974
 # System properties
 -include $(LOCAL_PATH)/system_prop.mk
 
+# API Level
+# Note3 was launched with KK
+PRODUCT_PROPERTY_OVERRIDES += \
+ro.product.first_api_level=19
+
 #LLVM for RenderScript
 #use qcom LLVM
 $(call inherit-product-if-exists, external/llvm/llvm-select.mk)
@@ -67,11 +72,13 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml \
+    frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml \
     frameworks/native/data/etc/android.hardware.telephony.cdma.xml:system/etc/permissions/android.hardware.telephony.cdma.xml \
     frameworks/native/data/etc/android.software.midi.xml:system/etc/permissions/android.software.midi.xml \
     frameworks/native/data/etc/android.hardware.consumerir.xml:system/etc/permissions/android.hardware.consumerir.xml \
-
+    frameworks/native/data/etc/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
+    external/ant-wireless/antradio-library/com.dsi.ant.antradio_library.xml:system/etc/permissions/com.dsi.ant.antradio_library.xml
 
 # NFC access control + feature files + configuration
 PRODUCT_COPY_FILES += \
@@ -92,13 +99,7 @@ PRODUCT_PACKAGES += \
     libantradio \
     antradio_app
 
-# codeaurora
-PRODUCT_PACKAGES += \
-    org.codeaurora.camera \
-    org.codeaurora.Performance \
-    libimscamera_jni
-
-# qcom apps
+# Aosp package
 PRODUCT_PACKAGES += \
     Updater \
     Protips \
@@ -116,6 +117,11 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/izat.conf:system/etc/izat.conf \
     $(LOCAL_PATH)/configs/sap.conf:system/etc/sap.conf
 
+# Vendor seccomp policy files for media components:
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/seccomp/mediaextractor.policy:/system/vendor/etc/seccomp_policy/mediaextractor.policy \
+    $(LOCAL_PATH)/seccomp/mediacodec.policy:/system/vendor/etc/seccomp_policy/mediacodec.policy
+
 # Busybox
 PRODUCT_PACKAGES += \
     toybox
@@ -130,8 +136,8 @@ PRODUCT_PACKAGES += \
 
 # Camera HIDL interfaces
 PRODUCT_PACKAGES += \
-    android.hardware.camera.provider@2.4-impl \
-    camera.device@1.0-impl
+    camera.device@1.0-impl \
+    android.hardware.camera.provider@2.4-impl
 
 # Input device
 PRODUCT_COPY_FILES += \
@@ -140,6 +146,12 @@ PRODUCT_COPY_FILES += \
 # IR
 PRODUCT_PACKAGES += \
     consumerir.msm8974
+
+# IR HIDL interfaces
+PRODUCT_PACKAGES += \
+    android.hardware.ir@1.0-impl \
+    android.hardware.ir@1.0-service \
+    android.hardware.ir@1.0
 
 # stk
 PRODUCT_PACKAGES += \
@@ -159,75 +171,36 @@ PRODUCT_PACKAGES += \
     iptables \
     ip-up-vpn
 
-# zibs
-PRODUCT_PACKAGES += \
-    gzip \
-    minigzip \
-    libunz
-
 # ks
 PRODUCT_PACKAGES += \
     ks \
     qcks \
     efsks
 
-# lib_nl
-PRODUCT_PACKAGES += \
-    libnl_2
-
 # Recorder
 PRODUCT_PACKAGES += \
     Recorder
 
-# Extra tools
-PRODUCT_PACKAGES += \
-    7z \
-    bash \
-    bzip2 \
-    curl \
-    fsck.ntfs \
-    gdbserver \
-    htop \
-    lib7z \
-    libsepol \
-    micro_bench \
-    mke2fs \
-    mkfs.ntfs \
-    mount.ntfs \
-    oprofiled \
-    pigz \
-    powertop \
-    sqlite3 \
-    strace \
-    tune2fs \
-    unrar \
-    unzip \
-    vim \
-    wget \
-    zip
-
-# Openssh
-PRODUCT_PACKAGES += \
-    scp \
-    sftp \
-    ssh \
-    sshd \
-    sshd_config \
-    ssh-keygen \
-    start-ssh
-
 # Keylayouts
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/keylayout/Button_Jack.kl:system/usr/keylayout/Button_Jack.kl \
-    $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
-    $(LOCAL_PATH)/keylayout/philips_remote_ir.kl:system/usr/keylayout/philips_remote_ir.kl \
-    $(LOCAL_PATH)/keylayout/samsung_remote_ir.kl:system/usr/keylayout/samsung_remote_ir.kl \
-    $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl \
-    $(LOCAL_PATH)/keylayout/ue_rf4ce_remote.kl:system/usr/keylayout/ue_rf4ce_remote.kl
+   $(LOCAL_PATH)/keylayout/Button_Jack.kl:system/usr/keylayout/Button_Jack.kl \
+   $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
+   $(LOCAL_PATH)/keylayout/philips_remote_ir.kl:system/usr/keylayout/philips_remote_ir.kl \
+   $(LOCAL_PATH)/keylayout/samsung_remote_ir.kl:system/usr/keylayout/samsung_remote_ir.kl \
+   $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl \
+   $(LOCAL_PATH)/keylayout/ue_rf4ce_remote.kl:system/usr/keylayout/ue_rf4ce_remote.kl
+
+# Health
+PRODUCT_PACKAGES += \
+   android.hardware.health@1.0-impl
 
 # Keystore
 PRODUCT_PACKAGES += \
    keystore.msm8974
+
+# Keymaster HIDL interfaces
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@3.0-impl
 
 # Lights
 PRODUCT_PACKAGES += \
@@ -249,12 +222,13 @@ PRODUCT_COPY_FILES += \
 
 # NFC
 PRODUCT_PACKAGES += \
-    android.hardware.nfc@1.0-impl \
     libnfc-nci \
     libnfc_nci_jni \
     com.android.nfc_extras \
     NfcNci \
-    Tag
+    Tag \
+    android.hardware.nfc@1.0-impl \
+    android.hardware.nfc@1.0-service
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/nfcee_access.xml:system/etc/nfcee_access.xml \
@@ -262,21 +236,20 @@ PRODUCT_COPY_FILES += \
 
 # Radio
 PRODUCT_PACKAGES += \
-    libshim_ril \
-    librmnetctl \
-    rmnetcli \
-    netmgrd
+    libshim_ril
+
+# Perf
+PRODUCT_PACKAGES += \
+    libshims_atomic
+
+# Radio HIDL
+PRODUCT_PACKAGES += \
+    android.hardware.radio@1.0-impl \
+    android.hardware.radio.deprecated-impl
 
 # HIDL
 PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/manifest.xml:system/vendor/manifest.xml
-
-# Net
-PRODUCT_PACKAGES += \
-    arp \
-    host \
-    netcat \
-    scp
 
 # Ramdisk
 PRODUCT_PACKAGES += \
@@ -284,27 +257,33 @@ PRODUCT_PACKAGES += \
     init.qcom.rc \
     init.qcom.usb.rc \
     init.target.rc \
-    logcat-sh.sh \
     ueventd.qcom.rc
 
 # Thermal
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/thermal-engine-8974.conf:system/etc/thermal-engine-8974.conf
 
+# Thermal HAL
+PRODUCT_PACKAGES += \
+    android.hardware.thermal@1.0-impl \
+    android.hardware.thermal@1.0-service \
+    android.hardware.thermal@1.0
+
 # Wifi
 PRODUCT_PACKAGES += \
+    libwpa_client \
+    hostapd \
     wificond \
     wifilogd \
     libnetcmdiface \
     macloader \
-    libwpa_client \
     wpa_supplicant
 
 # WiFi HIDL interfaces
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service
 
-# Vibrator
+# Vibrator HIDL interfaces
 PRODUCT_PACKAGES += \
     android.hardware.vibrator@1.0-impl
 
@@ -313,6 +292,10 @@ PRODUCT_PACKAGES += \
     fibmap.f2fs \
     fsck.f2fs \
     mkfs.f2fs
+
+# GNSS HIDL interfaces
+PRODUCT_PACKAGES += \
+    android.hardware.gnss@1.0-impl
 
 # USB
 PRODUCT_PACKAGES += \

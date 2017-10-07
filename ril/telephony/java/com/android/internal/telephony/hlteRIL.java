@@ -327,7 +327,7 @@ public class hlteRIL extends RIL implements CommandsInterface {
                 setPreferredNetworkType(mPreferredNetworkType, null);
                 setCdmaSubscriptionSource(mCdmaSubscription, null);
                 if(mRilVersion >= 8)
-                    setCellInfoListRate(Integer.MAX_VALUE, null);
+                    //setCellInfoListRate(Integer.MAX_VALUE, null);
                 notifyRegistrantsRilConnectionChanged(((int[])ret)[0]);
                 break;
             // SAMSUNG STATES

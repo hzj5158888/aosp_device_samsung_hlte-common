@@ -1,3 +1,7 @@
 allow bluetooth bluetooth_device:chr_file { open write };
+allow bluetooth vendor_file:file { r_file_perms execute };
+allow bluetooth sysfs_bluetooth_writable:file rw_file_perms;
+allow bluetooth self:capability net_admin;
+allow bluetooth self:capability2 wake_alarm;
 allow bluetooth proc_bluetooth_writable:dir search;
 allow bluetooth wifi_data_file:file { open read };

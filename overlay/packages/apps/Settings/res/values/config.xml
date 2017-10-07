@@ -17,4 +17,8 @@
 <resources>
     <!-- Volume Rocker Wake -->
     <bool name="config_show_volumeRockerWake">true</bool>
+
+    <!-- fix bugs -->
+    <bool name="lift_to_wake_title">false</bool>
+
 </resources>

@@ -17,4 +17,8 @@
 <resources>
     <!-- make home button wake configurable in display settings -->
     <bool name="config_show_homeWake">true</bool>
+
+    <!-- fix bugs -->
+    <bool name="lift_to_wake_title">false</bool>
+
 </resources>

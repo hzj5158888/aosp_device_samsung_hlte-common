@@ -2,4 +2,6 @@ type sensorhubservice, domain;
 type sensorhubservice_exec, exec_type, file_type;
 allow system_app sysfs_display:file { getattr open read write };
 allow system_app sensorhubservice:binder call;
+allow system_app radio_data_file:dir getattr;
+allow system_app shell_data_file:dir { search };
 allow qti_init_shell sysfs_usb:file write;

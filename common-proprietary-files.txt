@@ -246,10 +246,6 @@ vendor/lib/libthermalioctl.so
 
 # DRM
 bin/qseecomd
-lib/drm/libfwdlockengine.so
-lib/libdrmdecrypt.so
-lib/libhdcp2.so
-lib/libstagefright_hdcp.so
 vendor/lib/libdrmfs.so
 vendor/lib/libdrmtime.so
 vendor/lib/librpmb.so
@@ -306,16 +302,11 @@ etc/sec_config
 bin/radish
 
 # Media
-vendor/lib/libDivxDrm.so
-vendor/lib/libI420colorconvert.so
-vendor/lib/libmm-color-convertor.so
-vendor/lib/libmmosal.so
 vendor/lib/libOmxAacDec.so
 vendor/lib/libOmxAmrwbplusDec.so
 vendor/lib/libOmxEvrcDec.so
 vendor/lib/libOmxQcelp13Dec.so
 vendor/lib/libOmxWmaDec.so
-vendor/lib/libSHIMDivxDrm.so
 
 # NFC
 vendor/firmware/bcm2079xB4_firmware.ncd
@@ -325,11 +316,6 @@ vendor/firmware/bcm2079xB5_pre_firmware.ncd
 
 # Perf
 vendor/lib/libqti-perfd-client.so
-
-# Postprocessing
-vendor/lib/libdisp-aba.so
--vendor/lib/libmm-abl.so
-vendor/lib/libmm-abl-oem.so
 
 # Qualcomm
 vendor/lib/libxml.so

@@ -1,0 +1,3 @@
+allow gatekeeperd kernel:system module_request;
+allow gatekeeperd sysfs:file rw_file_perms;
+allow gatekeeperd sysfs_devices_system_cpu:file rw_file_perms;
