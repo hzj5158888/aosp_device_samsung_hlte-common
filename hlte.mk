@@ -34,10 +34,6 @@ TARGET_BOARD_PLATFORM := msm8974
 PRODUCT_PROPERTY_OVERRIDES += \
 ro.product.first_api_level=19
 
-#LLVM for RenderScript
-#use qcom LLVM
-$(call inherit-product-if-exists, external/llvm/llvm-select.mk)
-
 # Device uses high-density artwork where available
 PRODUCT_AAPT_CONFIG := normal hdpi xhdpi xxhdpi
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
@@ -60,6 +56,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
     frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
     frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
+    frameworks/native/data/etc/android.hardware.wifi.passpoint.xml:system/etc/permissions/android.hardware.wifi.passpoint.xml \
     frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
     frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml \
     frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:system/etc/permissions/android.hardware.sensor.gyroscope.xml \
@@ -134,8 +131,11 @@ PRODUCT_PACKAGES += \
     camera.msm8974 \
     libstlport \
     libxml2 \
-    camera \
-    camera2
+    camera2 \
+
+# Camera SHIM
+PRODUCT_PACKAGES += \
+    libcamera_parameters_shim
 
 # Camera HIDL interfaces
 PRODUCT_PACKAGES += \
@@ -264,6 +264,10 @@ PRODUCT_PACKAGES += \
     init.target.rc \
     ueventd.qcom.rc
 
+# libRSDriver_adreno dependency
+PRODUCT_PACKAGES += \
+    libLLVM
+
 # Thermal
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/thermal-engine-8974.conf:system/etc/thermal-engine-8974.conf
@@ -274,6 +278,7 @@ PRODUCT_PACKAGES += \
 
 # Wifi
 PRODUCT_PACKAGES += \
+    libwifi-hal-bcm \
     libwpa_client \
     hostapd \
     wificond \
@@ -290,19 +295,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.vibrator@1.0-impl
 
-# F2FS
-PRODUCT_PACKAGES += \
-    fibmap.f2fs \
-    fsck.f2fs \
-    mkfs.f2fs
-
 # GNSS HIDL interfaces
 PRODUCT_PACKAGES += \
     android.hardware.gnss@1.0-impl
-
-# USB
-PRODUCT_PACKAGES += \
-    com.android.future.usb.accessory
 
 # USB HIDL interfaces
 PRODUCT_PACKAGES += \
@@ -316,8 +311,16 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf \
     $(LOCAL_PATH)/configs/p2p_supplicant_overlay.conf:system/etc/wifi/p2p_supplicant_overlay.conf
 
-# Enabling video for live effects
--include frameworks/base/data/videos/VideoPackage1.mk
+# In userdebug, add minidebug info the the boot image and the system server to support
+# diagnosing native crashes.
+ifneq (,$(filter userdebug, $(TARGET_BUILD_VARIANT)))
+    # Boot image.
+    PRODUCT_DEX_PREOPT_BOOT_FLAGS += --generate-mini-debug-info
+    # System server and some of its services.
+    # Note: we cannot use PRODUCT_SYSTEM_SERVER_JARS, as it has not been expanded at this point.
+    $(call add-product-dex-preopt-module-config,services,--generate-mini-debug-info)
+    $(call add-product-dex-preopt-module-config,wifi-service,--generate-mini-debug-info)
+endif
 
 # Common msm8974
 $(call inherit-product, device/samsung/msm8974-common/msm8974.mk)

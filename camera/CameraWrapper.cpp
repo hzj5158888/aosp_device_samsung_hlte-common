@@ -23,6 +23,7 @@
 
 #define LOG_TAG "CameraWrapper"
 
+#include <cutils/native_handle.h>
 #include <android-base/properties.h>
 #include <camera/CameraParameters.h>
 #include <camera/Camera.h>
@@ -31,6 +32,7 @@
 #include <hardware/hardware.h>
 #include <utils/String8.h>
 #include <utils/threads.h>
+#include <media/hardware/HardwareAPI.h> // For VideoNativeHandleMetadata
 
 #define BACK_CAMERA_ID 0
 #define FRONT_CAMERA_ID 1
@@ -38,6 +40,12 @@
 using android::base::GetProperty;
 
 using namespace android;
+
+static const char KEY_DIS[] = "dis";
+static const char DIS_DISABLE[] = "disable";
+static const char KEY_ZSL[] = "zsl";
+static const char ZSL_OFF[] = "off";
+static const char ZSL_ON[] = "on";
 
 static Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
@@ -200,10 +208,10 @@ static char *camera_fixup_setparams(int id, const char *settings)
 
     if (!isTorch && !wasTorch) {
         if (isVideo) {
-            params.set(CameraParameters::KEY_DIS, CameraParameters::DIS_DISABLE);
-            params.set(CameraParameters::KEY_ZSL, CameraParameters::ZSL_OFF);
+            params.set(KEY_DIS, DIS_DISABLE);
+            params.set(KEY_ZSL, ZSL_OFF);
         } else {
-            params.set(CameraParameters::KEY_ZSL, CameraParameters::ZSL_ON);
+            params.set(KEY_ZSL, ZSL_ON);
         }
     }
 
@@ -408,10 +416,16 @@ static void camera_release_recording_frame(struct camera_device *device,
     if (!device)
         return;
 
+    VideoNativeHandleMetadata* md = (VideoNativeHandleMetadata*) opaque;
+    native_handle_t* nh = md->pHandle;
+
     ALOGV("%s->%08X->%08X", __FUNCTION__, (uintptr_t)device,
             (uintptr_t)(((wrapper_camera_device_t*)device)->vendor));
 
     VENDOR_CALL(device, release_recording_frame, opaque);
+
+    native_handle_close(nh);
+    native_handle_delete(nh);
 }
 
 static int camera_auto_focus(struct camera_device *device)

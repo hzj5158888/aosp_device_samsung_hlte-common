@@ -44,7 +44,7 @@ BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 BOARD_KERNEL_IMAGE_NAME := zImage-dtb
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
-BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02900000 --tags_offset 0x02700000 --dt device/samsung/hlte-common/dt.img
+BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02900000 --tags_offset 0x02700000
 LZMA_RAMDISK_TARGETS := recovery
 TARGET_KERNEL_CONFIG := lineage_hlte_bcm2079x_defconfig
 TARGET_KERNEL_SELINUX_CONFIG := selinux_defconfig
