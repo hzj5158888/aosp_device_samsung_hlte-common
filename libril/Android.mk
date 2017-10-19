@@ -1,6 +1,6 @@
 # Copyright 2006 The Android Open Source Project
 
-ifeq ($(filter-out kanuti kitakami loire rhine shinano,$(PRODUCT_PLATFORM)),)
+ifeq ($(BOARD_PROVIDES_LIBRIL),true)
 
 LOCAL_PATH:= $(call my-dir)
 
