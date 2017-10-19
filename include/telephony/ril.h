@@ -1111,6 +1111,13 @@ typedef struct
   int              pin1_replaced;   /* applicable to USIM, CSIM & ISIM */
   RIL_PinState     pin1;
   RIL_PinState     pin2;
+  /* Samsung SIM PIN/Unlock fields */
+  int              pin1_num_retries;
+  int              puk1_num_retries;
+  int              pin2_num_retries;
+  int              puk2_num_retries;
+  int              perso_unblock_retries;
+  /* End of Samsung SIM PIN/Unlock fields */
 } RIL_AppStatus;
 
 /* Deprecated, use RIL_CardStatus_v6 */
@@ -6320,6 +6327,35 @@ typedef struct {
 
 #define RIL_RESPONSE_ACKNOWLEDGEMENT 800
 
+/**********************************************************
+ * SAMSUNG REQUESTS
+ **********************************************************/
+#define SAMSUNG_REQUEST_BASE 10000
+#define RIL_REQUEST_DIAL_EMERGENCY_CALL 10001
+#define RIL_REQUEST_CALL_DEFLECTION 10002
+#define RIL_REQUEST_MODIFY_CALL_INITIATE 10003
+#define RIL_REQUEST_MODIFY_CALL_CONFIRM 10004
+#define RIL_REQUEST_SET_VOICE_DOMAIN_PREF 10005
+#define RIL_REQUEST_SAFE_MODE 10006
+#define RIL_REQUEST_SET_TRANSMIT_POWER 10007
+#define RIL_REQUEST_GET_CELL_BROADCAST_CONFIG 10008
+#define RIL_REQUEST_GET_PHONEBOOK_STORAGE_INFO 10009
+#define RIL_REQUEST_GET_PHONEBOOK_ENTRY 10010
+#define RIL_REQUEST_ACCESS_PHONEBOOK_ENTRY 10011
+#define RIL_REQUEST_USIM_PB_CAPA 10012
+#define RIL_REQUEST_LOCK_INFO 10013
+#define RIL_REQUEST_STK_SIM_INIT_EVENT 10014
+#define RIL_REQUEST_SET_PREFERRED_NETWORK_LIST 10015
+#define RIL_REQUEST_GET_PREFERRED_NETWORK_LIST 10016
+#define RIL_REQUEST_CHANGE_SIM_PERSO 10017
+#define RIL_REQUEST_ENTER_SIM_PERSO 10018
+#define RIL_REQUEST_SEND_ENCODED_USSD 10019
+#define RIL_REQUEST_CDMA_SEND_SMS_EXPECT_MORE 10020
+#define RIL_REQUEST_HANGUP_VT 10021
+#define RIL_REQUEST_REQUEST_HOLD 10022
+#define RIL_REQUEST_SET_SIM_POWER 10023
+#define RIL_REQUEST_SET_LTE_BAND_MODE 10024
+
 /***********************************************************************/
 
 
@@ -6934,6 +6970,30 @@ typedef struct {
   *
   */
 #define RIL_UNSOL_PCO_DATA 1046
+
+/**********************************************************
+ * SAMSUNG UNSOLS
+ *********************************************************/
+#define SAMSUNG_UNSOL_BASE 11000
+#define RIL_UNSOL_RELEASE_COMPLETE_MESSAGE 11001
+#define RIL_UNSOL_STK_SEND_SMS_RESULT 11002
+#define RIL_UNSOL_STK_CALL_CONTROL_RESULT 11003
+#define RIL_UNSOL_DEVICE_READY_NOTI 11008
+#define RIL_UNSOL_AM 11010
+#define RIL_UNSOL_SAP 11013
+#define RIL_UNSOL_UART 11020
+#define RIL_UNSOL_SIM_PB_READY 11021
+#define RIL_UNSOL_VE 11024
+#define RIL_UNSOL_IMS_REGISTRATION_STATE_CHANGED 11027
+#define RIL_UNSOL_MODIFY_CALL 11028
+#define RIL_UNSOL_CS_FALLBACK 11030
+#define RIL_UNSOL_VOICE_SYSTEM_ID 11032
+#define RIL_UNSOL_IMS_RETRYOVER 11034
+#define RIL_UNSOL_PB_INIT_COMPLETE 11035
+#define RIL_UNSOL_HOME_NETWORK_NOTI 11043
+#define RIL_UNSOL_STK_CALL_STATUS 11054
+#define RIL_UNSOL_ON_SS_LL 11055
+#define RIL_UNSOL_IMS_PREFERENCE_CHANGED 11061
 
  /**
   * RIL_UNSOL_MODEM_RESTART

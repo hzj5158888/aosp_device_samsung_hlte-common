@@ -1,5 +1,7 @@
 # Copyright 2006 The Android Open Source Project
 
+ifneq ($(BOARD_PROVIDES_LIBRIL),true)
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -19,7 +21,6 @@ LOCAL_SHARED_LIBRARIES := \
     libhardware_legacy \
     librilutils \
     android.hardware.radio@1.0 \
-    android.hardware.radio@1.1 \
     android.hardware.radio.deprecated@1.0 \
     libhidlbase  \
     libhidltransport \
@@ -28,7 +29,7 @@ LOCAL_SHARED_LIBRARIES := \
 LOCAL_STATIC_LIBRARIES := \
     libprotobuf-c-nano-enable_malloc \
 
-LOCAL_CFLAGS += -Wall -Wextra -Wno-unused-parameter -Werror
+LOCAL_CFLAGS += -Wno-unused-parameter
 
 ifeq ($(SIM_COUNT), 2)
     LOCAL_CFLAGS += -DANDROID_MULTI_SIM -DDSDA_RILD1
@@ -45,3 +46,4 @@ LOCAL_SANITIZE := integer
 
 include $(BUILD_SHARED_LIBRARY)
 
+endif # BOARD_PROVIDES_LIBRIL

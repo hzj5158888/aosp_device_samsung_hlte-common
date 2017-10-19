@@ -247,11 +247,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libshims_atomic
 
-# Radio HIDL
-PRODUCT_PACKAGES += \
-    android.hardware.radio@1.0-impl \
-    android.hardware.radio.deprecated-impl
-
 # HIDL
 PRODUCT_COPY_FILES += \
    $(LOCAL_PATH)/manifest.xml:system/vendor/manifest.xml
