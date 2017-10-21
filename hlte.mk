@@ -240,8 +240,8 @@ PRODUCT_COPY_FILES += \
 # Radio
 PRODUCT_PACKAGES += \
     libsecnativefeature \
-    libsecril-client \
-    libshim_ril
+    libsecril-client-sap \
+    libsecril-client
 
 # Perf
 PRODUCT_PACKAGES += \

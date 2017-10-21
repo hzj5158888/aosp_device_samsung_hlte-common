@@ -63,8 +63,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.data.netmgrd.qos.enable=true \
     persist.data.qmi.adb_logmask=0 \
     persist.radio.add_power_save=1 \
-    ro.ril.telephony.mqanelements=6 \
-    ro.telephony.ril_class=hlteRIL
+    ro.ril.telephony.mqanelements=6
 
 # Sensors
 PRODUCT_PROPERTY_OVERRIDES += \
