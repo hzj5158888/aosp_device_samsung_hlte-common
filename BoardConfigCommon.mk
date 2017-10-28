@@ -29,7 +29,7 @@ TARGET_BOOTLOADER_BOARD_NAME := MSM8974
 # only build bootimg
 TARGET_BOOTIMG_SIGNED := true
 
-# krait configs
+# krait
 TARGET_USE_KRAIT_PLD_SET := true
 TARGET_KRAIT_BIONIC_PLDOFFS := 10
 TARGET_KRAIT_BIONIC_PLDTHRESH := 10
@@ -74,7 +74,7 @@ TARGET_USE_COMPAT_GRALLOC_ALIGN := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 
 # Added to indicate that protobuf-c is supported in this build
-PROTOBUF_SUPPORTED := false
+PROTOBUF_SUPPORTED := true
 
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := false

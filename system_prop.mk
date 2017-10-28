@@ -12,6 +12,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
     media.stagefright.legacyencoder=true \
     media.stagefright.less-secure=true
 
+# Keymast
+PRODUCT_PROPERTY_OVERRIDES += \
+    sys.keymaster.loaded=true
+
 # Audio
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.audio.fluence.speaker=true \

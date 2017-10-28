@@ -111,6 +111,9 @@ PRODUCT_PACKAGES += \
     AccountAndSyncSettings
 
 # GPS
+PRODUCT_PACKAGES += \
+    gps.msm8974
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/flp.conf:system/etc/flp.conf \
     $(LOCAL_PATH)/configs/gps.conf:system/etc/gps.conf \
@@ -236,6 +239,8 @@ PRODUCT_COPY_FILES += \
 
 # Radio
 PRODUCT_PACKAGES += \
+    libsecnativefeature \
+    libsecril-client \
     libshim_ril
 
 # Perf
@@ -265,9 +270,7 @@ PRODUCT_COPY_FILES += \
 
 # Thermal HAL
 PRODUCT_PACKAGES += \
-    android.hardware.thermal@1.0-impl \
-    android.hardware.thermal@1.0-service \
-    android.hardware.thermal@1.0
+    android.hardware.thermal@1.0-impl
 
 # Wifi
 PRODUCT_PACKAGES += \
