@@ -82,18 +82,12 @@ TARGET_HW_DISK_ENCRYPTION := false
 # DEXPREOPT
 WITH_DEXPREOPT := false
 
-<<<<<<< HEAD
-# RIL
-BOARD_RIL_CLASS := ../../../device/samsung/hlte-common/ril
-
 # Fonts
 EXTENDED_FONT_FOOTPRINT := true
 
 # Vendor Interface Manifest
 DEVICE_MANIFEST_FILE := $(LOCAL_PATH)/manifest.xml
 
-=======
->>>>>>> a7c1b23... hlte-common: Use opensource libril and rild
 # Graphics
 TARGET_HAVE_NEW_GRALLOC := true
 BOARD_EGL_CFG := device/samsung/hlte-common/configs/egl.cfg
