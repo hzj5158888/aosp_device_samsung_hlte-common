@@ -114,11 +114,7 @@ RIL_RadioFunctions s_callbacks = {0, NULL, NULL, NULL, NULL, NULL};
 static int s_registerCalled = 0;
 
 static pthread_t s_tid_dispatch;
-static pthread_t s_tid_reader;
 static int s_started = 0;
-
-static int s_fdDebug = -1;
-static int s_fdDebug_socket2 = -1;
 
 static int s_fdWakeupRead;
 static int s_fdWakeupWrite;
@@ -128,43 +124,29 @@ int s_wakelock_count = 0;
 static struct ril_event s_wakeupfd_event;
 
 static pthread_mutex_t s_pendingRequestsMutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t s_writeMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t s_wakeLockCountMutex = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests = NULL;
 
 #if (SIM_COUNT >= 2)
 static pthread_mutex_t s_pendingRequestsMutex_socket2  = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t s_writeMutex_socket2            = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests_socket2          = NULL;
 #endif
 
 #if (SIM_COUNT >= 3)
 static pthread_mutex_t s_pendingRequestsMutex_socket3  = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t s_writeMutex_socket3            = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests_socket3          = NULL;
 #endif
 
 #if (SIM_COUNT >= 4)
 static pthread_mutex_t s_pendingRequestsMutex_socket4  = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t s_writeMutex_socket4            = PTHREAD_MUTEX_INITIALIZER;
 static RequestInfo *s_pendingRequests_socket4          = NULL;
 #endif
-
-static struct ril_event s_wake_timeout_event;
-static struct ril_event s_debug_event;
-
 
 static const struct timeval TIMEVAL_WAKE_TIMEOUT = {ANDROID_WAKE_LOCK_SECS,ANDROID_WAKE_LOCK_USECS};
 
 
 static pthread_mutex_t s_startupMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t s_startupCond = PTHREAD_COND_INITIALIZER;
-
-static pthread_mutex_t s_dispatchMutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t s_dispatchCond = PTHREAD_COND_INITIALIZER;
-
-static RequestInfo *s_toDispatchHead = NULL;
-static RequestInfo *s_toDispatchTail = NULL;
 
 static UserCallbackInfo *s_last_wake_timeout_info = NULL;
 
@@ -209,14 +191,6 @@ static UnsolResponseInfo s_unsolResponses[] = {
 #include "ril_unsol_commands.h"
 };
 
-static CommandInfo s_commands_v[] = {
-#include "ril_commands_vendor.h"
-};
-
-static UnsolResponseInfo s_unsolResponses_v[] = {
-#include "ril_unsol_commands_vendor.h"
-};
-
 char * RIL_getServiceName() {
     return ril_service_name;
 }
@@ -256,18 +230,6 @@ addRequestToList(int serial, int slotId, int request) {
 #endif
 #endif
 
-    CommandInfo *pCI = NULL;
-    if (request > SAMSUNG_REQUEST_BASE) {
-        int index = request - SAMSUNG_REQUEST_BASE;
-        RLOGD("processCommandBuffer: samsung request=%d, index=%d",
-                request, index);
-        if (index < (int32_t)NUM_ELEMS(s_commands_v))
-            pCI = &(s_commands_v[index]);
-    } else {
-        if (request < (int32_t)NUM_ELEMS(s_commands))
-            pCI = &(s_commands[request]);
-    }
-
     pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
     if (pRI == NULL) {
         RLOGE("Memory allocation failed for request %s", requestToString(request));
@@ -275,14 +237,8 @@ addRequestToList(int serial, int slotId, int request) {
     }
 
     pRI->token = serial;
+    pRI->pCI = &(s_commands[request]);
     pRI->socket_id = socket_id;
-
-    /* Hack to include Samsung requests */
-    if (request > SAMSUNG_REQUEST_BASE) {
-        pRI->pCI = &(s_commands_v[request - SAMSUNG_REQUEST_BASE]);
-    } else {
-        pRI->pCI = &(s_commands[request]);
-    }
 
     ret = pthread_mutex_lock(pendingRequestsMutexHook);
     assert (ret == 0);
@@ -461,9 +417,6 @@ extern "C" void RIL_setcallbacks (const RIL_RadioFunctions *callbacks) {
 
 extern "C" void
 RIL_register (const RIL_RadioFunctions *callbacks) {
-    int ret;
-    int flags;
-
     RLOGI("SIM_COUNT: %d", SIM_COUNT);
 
     if (callbacks == NULL) {
@@ -495,18 +448,8 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
         assert(i == s_commands[i].requestNumber);
     }
 
-    for (int i = 0; i < (int)NUM_ELEMS(s_commands_v); i++) {
-        assert(i + SAMSUNG_REQUEST_BASE
-                == s_commands[i].requestNumber);
-    }
-
     for (int i = 0; i < (int)NUM_ELEMS(s_unsolResponses); i++) {
         assert(i + RIL_UNSOL_RESPONSE_BASE
-                == s_unsolResponses[i].requestNumber);
-    }
-
-    for (int i = 0; i < (int)NUM_ELEMS(s_unsolResponses_v); i++) {
-        assert(i + SAMSUNG_UNSOL_BASE
                 == s_unsolResponses[i].requestNumber);
     }
 
@@ -609,9 +552,7 @@ checkAndDequeueRequestInfoIfAck(struct RequestInfo *pRI, bool isAck) {
 extern "C" void
 RIL_onRequestAck(RIL_Token t) {
     RequestInfo *pRI;
-    int ret;
 
-    size_t errorOffset;
     RIL_SOCKET_ID socket_id = RIL_SOCKET_1;
 
     pRI = (RequestInfo *)t;
@@ -645,7 +586,6 @@ extern "C" void
 RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen) {
     RequestInfo *pRI;
     int ret;
-    size_t errorOffset;
     RIL_SOCKET_ID socket_id = RIL_SOCKET_1;
 
     pRI = (RequestInfo *)t;
@@ -788,8 +728,6 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     int ret;
     bool shouldScheduleTimeout = false;
     RIL_SOCKET_ID soc_id = RIL_SOCKET_1;
-    UnsolResponseInfo *pRI = NULL;
-    int32_t pRI_elements;
 
 #if defined(ANDROID_MULTI_SIM)
     soc_id = socket_id;
@@ -803,24 +741,9 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     }
 
     unsolResponseIndex = unsolResponse - RIL_UNSOL_RESPONSE_BASE;
-    pRI = s_unsolResponses;
 
-    /* Hack to include Samsung responses */
-    if (unsolResponse > SAMSUNG_UNSOL_BASE) {
-        unsolResponseIndex = unsolResponse - SAMSUNG_UNSOL_BASE;
-        pRI = s_unsolResponses_v;
-    }
-
-    pRI_elements = pRI == s_unsolResponses
-            ? (int32_t)NUM_ELEMS(s_unsolResponses) : (int32_t)NUM_ELEMS(s_unsolResponses_v);
-
-    if (unsolResponseIndex >= 0 && unsolResponseIndex < pRI_elements) {
-        pRI = &pRI[unsolResponseIndex];
-    } else {
-        pRI = NULL;
-    }
-
-    if (pRI == NULL || pRI->responseFunction == NULL) {
+    if ((unsolResponseIndex < 0)
+        || (unsolResponseIndex >= (int32_t)NUM_ELEMS(s_unsolResponses))) {
         RLOGE("unsupported unsolicited response code %d", unsolResponse);
         return;
     }
@@ -828,7 +751,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     // Grab a wake lock if needed for this reponse,
     // as we exit we'll either release it immediately
     // or set a timer to release it later.
-    switch (pRI->wakeType) {
+    switch (s_unsolResponses[unsolResponseIndex].wakeType) {
         case WAKE_PARTIAL:
             grabPartialWakeLock();
             shouldScheduleTimeout = true;
@@ -845,7 +768,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
 
     int responseType;
     if (s_callbacks.version >= 13
-                && pRI->wakeType == WAKE_PARTIAL) {
+                && s_unsolResponses[unsolResponseIndex].wakeType == WAKE_PARTIAL) {
         responseType = RESPONSE_UNSOLICITED_ACK_EXP;
     } else {
         responseType = RESPONSE_UNSOLICITED;
@@ -855,7 +778,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     int rwlockRet = pthread_rwlock_rdlock(radioServiceRwlockPtr);
     assert(rwlockRet == 0);
 
-    ret = pRI->responseFunction(
+    ret = s_unsolResponses[unsolResponseIndex].responseFunction(
             (int) soc_id, responseType, 0, RIL_E_SUCCESS, const_cast<void*>(data),
             datalen);
 
@@ -880,7 +803,7 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
     }
 
 #if VDBG
-    RLOGI("%s UNSOLICITED: %s length:%d", rilSocketIdToString(soc_id),
+    RLOGI("%s UNSOLICITED: %s length:%zu", rilSocketIdToString(soc_id),
             requestToString(unsolResponse), datalen);
 #endif
 
@@ -1008,7 +931,7 @@ failCauseToString(RIL_Errno e) {
         case RIL_E_SIM_FULL: return "E_SIM_FULL";
         case RIL_E_NETWORK_REJECT: return "E_NETWORK_REJECT";
         case RIL_E_OPERATION_NOT_ALLOWED: return "E_OPERATION_NOT_ALLOWED";
-        case RIL_E_EMPTY_RECORD: "E_EMPTY_RECORD";
+        case RIL_E_EMPTY_RECORD: return "E_EMPTY_RECORD";
         case RIL_E_INVALID_SMS_FORMAT: return "E_INVALID_SMS_FORMAT";
         case RIL_E_ENCODING_ERR: return "E_ENCODING_ERR";
         case RIL_E_INVALID_SMSC_ADDRESS: return "E_INVALID_SMSC_ADDRESS";
@@ -1223,6 +1146,7 @@ requestToString(int request) {
         case RIL_REQUEST_GET_ACTIVITY_INFO: return "GET_ACTIVITY_INFO";
         case RIL_REQUEST_SET_CARRIER_RESTRICTIONS: return "SET_CARRIER_RESTRICTIONS";
         case RIL_REQUEST_GET_CARRIER_RESTRICTIONS: return "GET_CARRIER_RESTRICTIONS";
+        case RIL_REQUEST_SET_CARRIER_INFO_IMSI_ENCRYPTION: return "SET_CARRIER_INFO_IMSI_ENCRYPTION";
         case RIL_RESPONSE_ACKNOWLEDGEMENT: return "RESPONSE_ACKNOWLEDGEMENT";
         case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: return "UNSOL_RESPONSE_RADIO_STATE_CHANGED";
         case RIL_UNSOL_RESPONSE_CALL_STATE_CHANGED: return "UNSOL_RESPONSE_CALL_STATE_CHANGED";
@@ -1268,6 +1192,7 @@ requestToString(int request) {
         case RIL_UNSOL_DC_RT_INFO_CHANGED: return "UNSOL_DC_RT_INFO_CHANGED";
         case RIL_UNSOL_RADIO_CAPABILITY: return "UNSOL_RADIO_CAPABILITY";
         case RIL_UNSOL_MODEM_RESTART: return "UNSOL_MODEM_RESTART";
+        case RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION: return "UNSOL_CARRIER_INFO_IMSI_ENCRYPTION";
         case RIL_UNSOL_ON_SS: return "UNSOL_ON_SS";
         case RIL_UNSOL_STK_CC_ALPHA_NOTIFY: return "UNSOL_STK_CC_ALPHA_NOTIFY";
         case RIL_UNSOL_LCEDATA_RECV: return "UNSOL_LCEDATA_RECV";
