@@ -42,10 +42,6 @@ PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 TARGET_SCREEN_HEIGHT := 1920
 TARGET_SCREEN_WIDTH := 1080
 
-$(call inherit-product, frameworks/native/build/phone-xxhdpi-3072-dalvik-heap.mk)
-
-$(call inherit-product-if-exists, frameworks/native/build/phone-xxhdpi-3072-hwui-memory.mk)
-
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
@@ -140,7 +136,9 @@ PRODUCT_PACKAGES += \
 # Camera HIDL interfaces
 PRODUCT_PACKAGES += \
     camera.device@1.0-impl \
-    android.hardware.camera.provider@2.4-impl
+    camera.device@3.2-impl \
+    android.hardware.camera.provider@2.4-impl \
+    android.hardware.camera.provider@2.4-service
 
 # Input device
 PRODUCT_COPY_FILES += \
@@ -153,8 +151,7 @@ PRODUCT_PACKAGES += \
 # IR HIDL interfaces
 PRODUCT_PACKAGES += \
     android.hardware.ir@1.0-impl \
-    android.hardware.ir@1.0-service \
-    android.hardware.ir@1.0
+    android.hardware.ir@1.0-service
 
 # stk
 PRODUCT_PACKAGES += \
@@ -195,6 +192,10 @@ PRODUCT_COPY_FILES += \
 
 # Health
 PRODUCT_PACKAGES += \
+   HealthService
+
+# Health HIDL
+PRODUCT_PACKAGES += \
    android.hardware.health@1.0-impl
 
 # Keystore
@@ -203,7 +204,8 @@ PRODUCT_PACKAGES += \
 
 # Keymaster HIDL interfaces
 PRODUCT_PACKAGES += \
-    android.hardware.keymaster@3.0-impl
+   android.hardware.keymaster@3.0-impl \
+   android.hardware.keymaster@3.0-service
 
 # Lights
 PRODUCT_PACKAGES += \
@@ -211,11 +213,13 @@ PRODUCT_PACKAGES += \
 
 # Lights HIDL interfaces
 PRODUCT_PACKAGES += \
-    android.hardware.light@2.0-impl
+    android.hardware.light@2.0-impl \
+    android.hardware.light@2.0-service
 
 # Sensors HIDL interfaces
 PRODUCT_PACKAGES += \
-    android.hardware.sensors@1.0-impl
+    android.hardware.sensors@1.0-impl \
+    android.hardware.sensors@1.0-service
 
 # Media
 PRODUCT_COPY_FILES += \
@@ -269,7 +273,8 @@ PRODUCT_COPY_FILES += \
 
 # Thermal HAL
 PRODUCT_PACKAGES += \
-    android.hardware.thermal@1.0-impl
+    android.hardware.thermal@1.0-impl \
+    android.hardware.thermal@1.0-service
 
 # Wifi
 PRODUCT_PACKAGES += \
@@ -288,11 +293,14 @@ PRODUCT_PACKAGES += \
 
 # Vibrator HIDL interfaces
 PRODUCT_PACKAGES += \
-    android.hardware.vibrator@1.0-impl
+    android.hardware.vibrator@1.0-impl \
+    android.hardware.vibrator@1.0-service
 
-# GNSS HIDL interfaces
+#GNSS HAL
 PRODUCT_PACKAGES += \
-    android.hardware.gnss@1.0-impl
+    libgnss \
+    android.hardware.gnss@1.0-impl \
+    android.hardware.gnss@1.0-service
 
 # USB HIDL interfaces
 PRODUCT_PACKAGES += \
@@ -316,6 +324,29 @@ ifneq (,$(filter userdebug, $(TARGET_BUILD_VARIANT)))
     $(call add-product-dex-preopt-module-config,services,--generate-mini-debug-info)
     $(call add-product-dex-preopt-module-config,wifi-service,--generate-mini-debug-info)
 endif
+
+# HWUI
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.hwui.texture_cache_size=72 \
+    ro.hwui.layer_cache_size=48 \
+    ro.hwui.path_cache_size=32 \
+    ro.hwui.gradient_cache_size=1 \
+    ro.hwui.drop_shadow_cache_size=6 \
+    ro.hwui.r_buffer_cache_size=8 \
+    ro.hwui.texture_cache_flushrate=0.4 \
+    ro.hwui.text_small_cache_width=1024 \
+    ro.hwui.text_small_cache_height=1024 \
+    ro.hwui.text_large_cache_width=2048 \
+    ro.hwui.text_large_cache_height=1024
+
+# Dalvik
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.heapstartsize=16m \
+    dalvik.vm.heapgrowthlimit=192m \
+    dalvik.vm.heapsize=512m \
+    dalvik.vm.heaptargetutilization=0.75 \
+    dalvik.vm.heapminfree=2m \
+    dalvik.vm.heapmaxfree=8m
 
 # Common msm8974
 $(call inherit-product, device/samsung/msm8974-common/msm8974.mk)

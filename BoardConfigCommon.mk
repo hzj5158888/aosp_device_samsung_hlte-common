@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# sdclang
--include device/qcom/common/sdclang/common.mk
-
 # inherit from common msm8974
 -include device/samsung/msm8974-common/BoardConfigCommon.mk
 
@@ -73,8 +70,8 @@ TARGET_PROVIDES_CAMERA_HAL := true
 TARGET_USE_COMPAT_GRALLOC_ALIGN := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 
-# Added to indicate that protobuf-c is supported in this build
-PROTOBUF_SUPPORTED := true
+# Binder API version
+TARGET_USES_64_BIT_BINDER := true
 
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := false
@@ -87,6 +84,7 @@ EXTENDED_FONT_FOOTPRINT := true
 
 # Vendor Interface Manifest
 DEVICE_MANIFEST_FILE := $(LOCAL_PATH)/manifest.xml
+DEVICE_MATRIX_FILE := $(LOCAL_PATH)/compatibility_matrix.xml
 
 # Graphics
 TARGET_HAVE_NEW_GRALLOC := true
@@ -98,8 +96,6 @@ VSYNC_EVENT_PHASE_OFFSET_NS := 7500000
 
 # Some of our vendor libs have text relocations
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS:= true
-TARGET_NEEDS_PLATFORM_TEXTRELS := \
-     $(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS)
 
 # Legacy BLOB Support
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
@@ -108,15 +104,19 @@ TARGET_HAS_LEGACY_CAMERA_HAL1 := true
 BOARD_FLASH_BLOCK_SIZE := 131072
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
-BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := f2fs
+BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 
 # Power HAL
 TARGET_POWERHAL_VARIANT := qcom
 TARGET_POWERHAL_SET_INTERACTIVE_EXT := $(LOCAL_PATH)/power/power_ext.c
 
+# Keymaster
+TARGET_KEYMASTER_WAIT_FOR_QSEE := true
+
 # Radio
 BOARD_PROVIDES_LIBRIL := true
 TARGET_RIL_VARIANT := caf
+PROTOBUF_SUPPORTED := true
 
 # Recovery
 BOARD_HAS_LARGE_FILESYSTEM := true
