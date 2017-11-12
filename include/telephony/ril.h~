@@ -420,10 +420,7 @@ typedef struct {
 
 typedef struct {
     RIL_CallState   state;
-    char            index;      /* Connection Index for use with, eg, AT+CHLD */
-    char            call_id;    /* Samsung call_id */
-    char            foo1;       /* Samsung */
-    char            foo2;       /* Samsung */
+    int             index;      /* Connection Index for use with, eg, AT+CHLD */
     int             toa;        /* type of address, eg 145 = intl */
     char            isMpty;     /* nonzero if is mpty call */
     char            isMT;       /* nonzero if call is mobile terminated */
@@ -433,11 +430,8 @@ typedef struct {
     char            isVoicePrivacy;     /* nonzero if CDMA voice privacy mode is active */
     char *          number;     /* Remote party number */
     int             numberPresentation; /* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
-    char            call_type;  /* Samsung*/
-    char            call_domain;/* Samsung*/
-    int             namePresentation; /* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
-    char *          csv;        /* Samsung */
     char *          name;       /* Remote party name */
+    int             namePresentation; /* 0=Allowed, 1=Restricted, 2=Not Specified/Unknown 3=Payphone */
     RIL_UUS_Info *  uusInfo;    /* NULL or Pointer to User-User Signaling Information */
 } RIL_Call;
 
@@ -589,11 +583,6 @@ typedef struct {
                          3GPP2 N.S0005 (IS-41C) Table 171 for CDMA,
                          -1 if unknown or not applicable*/
 } RIL_SMS_Response;
-
-typedef struct {
-    RIL_SMS_Response response;
-    int retryCount;   /* Samsung */
-} RIL_SMS_Response_Ext;
 
 /** Used by RIL_REQUEST_WRITE_SMS_TO_SIM */
 typedef struct {
@@ -7014,6 +7003,7 @@ typedef struct {
   */
 #define RIL_UNSOL_MODEM_RESTART 1047
 
+<<<<<<< HEAD
 /**
  * RIL_UNSOL_CARRIER_INFO_IMSI_ENCRYPTION
  *
@@ -7043,7 +7033,7 @@ typedef struct {
  * "response" is a const RIL_KeepaliveStatus *
  */
 #define RIL_UNSOL_KEEPALIVE_STATUS 1050
-
+=======
 /**********************************************************
  * SAMSUNG UNSOLS
  **********************************************************/
@@ -7080,6 +7070,7 @@ typedef struct {
 #define RIL_UNSOL_VOICE_RADIO_BEARER_HO_STATUS 11064
 #define RIL_UNSOL_CLM_NOTI 11065
 #define RIL_UNSOL_SIM_ICCID_NOTI 11066
+>>>>>>> a339bc9... [DO NOT MERGE - WIP] klte-common: libril: Add Samsung changes
 
 /***********************************************************************/
 
