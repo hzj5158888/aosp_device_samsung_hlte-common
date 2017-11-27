@@ -23,10 +23,14 @@ TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := MSM8974
 
-# only build bootimg
+# Only build bootimg
 TARGET_BOOTIMG_SIGNED := true
 
+# Binder API version
+TARGET_USES_64_BIT_BINDER := true
+
 # krait
+TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 TARGET_USE_KRAIT_PLD_SET := true
 TARGET_KRAIT_BIONIC_PLDOFFS := 10
 TARGET_KRAIT_BIONIC_PLDTHRESH := 10
@@ -52,6 +56,9 @@ TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
 
+# ADB
+TARGET_USES_LEGACY_ADB_INTERFACE := true
+
 # Audio
 QCOM_CSDCLIENT_ENABLED := false
 AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
@@ -70,14 +77,20 @@ TARGET_PROVIDES_CAMERA_HAL := true
 TARGET_USE_COMPAT_GRALLOC_ALIGN := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 
-# Binder API version
-TARGET_USES_64_BIT_BINDER := true
-
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := false
 
-# DEXPREOPT
-WITH_DEXPREOPT := false
+# Enable dex pre-opt to speed up initial boot
+ifeq ($(HOST_OS),linux)
+  ifeq ($(WITH_DEXPREOPT),)
+    WITH_DEXPREOPT := true
+    WITH_DEXPREOPT_PIC := true
+    ifneq ($(TARGET_BUILD_VARIANT),user)
+      # Retain classes.dex in APK's for non-user builds
+      DEX_PREOPT_DEFAULT := nostripping
+    endif
+  endif
+endif
 
 # Fonts
 EXTENDED_FONT_FOOTPRINT := true
@@ -85,14 +98,6 @@ EXTENDED_FONT_FOOTPRINT := true
 # Vendor Interface Manifest
 DEVICE_MANIFEST_FILE := $(LOCAL_PATH)/manifest.xml
 DEVICE_MATRIX_FILE := $(LOCAL_PATH)/compatibility_matrix.xml
-
-# Graphics
-TARGET_HAVE_NEW_GRALLOC := true
-BOARD_EGL_CFG := device/samsung/hlte-common/configs/egl.cfg
-
-# Display
-SF_VSYNC_EVENT_PHASE_OFFSET_NS := 5000000
-VSYNC_EVENT_PHASE_OFFSET_NS := 7500000
 
 # Some of our vendor libs have text relocations
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS:= true
@@ -103,8 +108,10 @@ TARGET_HAS_LEGACY_CAMERA_HAL1 := true
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072
 TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
+
+# Use mke2fs to create ext4 images
+TARGET_USES_MKE2FS := true
 
 # Power HAL
 TARGET_POWERHAL_VARIANT := qcom
@@ -154,6 +161,3 @@ WIFI_DRIVER_NVRAM_PATH      := "/system/etc/wifi/nvram_net.txt"
 
 # Enable Minikin text layout engine (will be the default soon)
 USE_MINIKIN := true
-
-# Include an expanded selection of fonts
-EXTENDED_FONT_FOOTPRINT := true

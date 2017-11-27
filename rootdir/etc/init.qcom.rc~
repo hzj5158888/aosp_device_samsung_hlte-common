@@ -90,6 +90,10 @@ on init
 
     symlink /sdcard /storage/sdcard0
 
+    # Create netmgr log dir
+    mkdir /data/vendor/netmgr 0770 radio radio
+    chmod 0770 /data/vendor/netmgr
+
     # Create directory for radio
     mkdir /data/vendor/radio 0770 system radio
 

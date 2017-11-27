@@ -44,8 +44,8 @@ vendor/firmware/bcm4335_V0111.0559_semcove.hcd|29f07d75c5ada4c89d208f25292630037
 vendor/firmware/bcm4335_V0111.0559_wisol.hcd|29f07d75c5ada4c89d208f252926300371992736
 
 # Camera
-bin/mm-qcamera-daemon
-lib/hw/camera.msm8974.so:lib/hw/camera.vendor.msm8974.so
+bin/mm-qcamera-daemon:vendor/bin/mm-qcamera-daemon
+lib/hw/camera.msm8974.so:vendor/lib/hw/camera.vendor.msm8974.so
 lib/libarcsoft_nighthawk.so
 lib/libliveframework.so
 lib/libmmcamera_interface.so
