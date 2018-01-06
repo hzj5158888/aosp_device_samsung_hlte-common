@@ -7550,6 +7550,7 @@ int radio::cdmaInfoRecInd(int slotId,
         RIL_CDMA_InformationRecords *recordsRil = (RIL_CDMA_InformationRecords *) response;
 
         char* string8 = NULL;
+	int ret = 0;
         int num = MIN(recordsRil->numberOfInfoRecs, RIL_CDMA_MAX_NUMBER_OF_INFO_RECS);
         if (recordsRil->numberOfInfoRecs > RIL_CDMA_MAX_NUMBER_OF_INFO_RECS) {
             RLOGE("cdmaInfoRecInd: received %d recs which is more than %d, dropping "
@@ -7625,6 +7626,17 @@ int radio::cdmaInfoRecInd(int slotId,
                 }
 
                 case RIL_CDMA_SIGNAL_INFO_REC: {
+                if (infoRec->rec.signal.isPresent
+                        /* IS95_CONST_IR_SIGNAL_IS54B */
+                        && infoRec->rec.signal.signalType == 2
+                        /* IS95_CONST_IR_ALERT_MED */
+                        && infoRec->rec.signal.alertPitch == 0
+                        /* IS95_CONST_IR_SIG_IS54B_L */
+                        && infoRec->rec.signal.signal == 1) {
+                    /* Drop the response to workaround the "ring of death" bug */
+                    ret = 1;
+                }
+
                     record->signal.resize(1);
                     record->signal[0].isPresent = infoRec->rec.signal.isPresent;
                     record->signal[0].signalType = infoRec->rec.signal.signalType;
