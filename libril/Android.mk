@@ -1,6 +1,9 @@
 # Copyright 2006 The Android Open Source Project
 
+ifeq ($(filter-out kanuti kitakami loire rhine shinano,$(PRODUCT_PLATFORM)),)
+
 LOCAL_PATH:= $(call my-dir)
+
 include $(CLEAR_VARS)
 
 LOCAL_VENDOR_MODULE := true
@@ -44,4 +47,5 @@ LOCAL_CLANG := true
 LOCAL_SANITIZE := integer
 
 include $(BUILD_SHARED_LIBRARY)
+endif
 

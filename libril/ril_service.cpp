@@ -29,7 +29,6 @@
 #include <hidl/HidlTransportSupport.h>
 #include <utils/SystemClock.h>
 #include <inttypes.h>
-#include <cutils/properties.h>
 
 #define INVALID_HEX_CHAR 16
 
@@ -3223,7 +3222,7 @@ int radio::getCurrentCallsResponse(int slotId,
                 RIL_Call *p_cur = ((RIL_Call **) response)[i];
                 /* each call info */
                 calls[i].state = (CallState) p_cur->state;
-                calls[i].index = p_cur->index & 0xff;
+                calls[i].index = p_cur->index;
                 calls[i].toa = p_cur->toa;
                 calls[i].isMpty = p_cur->isMpty;
                 calls[i].isMT = p_cur->isMT;
@@ -3906,10 +3905,6 @@ int radio::getOperatorResponse(int slotId,
 #if VDBG
     RLOGD("getOperatorResponse: serial %d", serial);
 #endif
-    int mqanelements;
-    char value[PROPERTY_VALUE_MAX];
-    property_get("ro.ril.telephony.mqanelements", value, "4");
-	mqanelements = atoi(value);
 
     if (radioService[slotId]->mRadioResponse != NULL) {
         RadioResponseInfo responseInfo = {};
@@ -3918,14 +3913,14 @@ int radio::getOperatorResponse(int slotId,
         hidl_string shortName;
         hidl_string numeric;
         int numStrings = responseLen / sizeof(char *);
-        if (response == NULL || numStrings != mqanelements - 2) {
+        if (response == NULL || numStrings != 3) {
             RLOGE("getOperatorResponse Invalid response: NULL");
             if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
 
         } else {
             char **resp = (char **) response;
             longName = convertCharPtrToHidlString(resp[0]);
-            shortName = convertCharPtrToHidlString(resp[0]);
+            shortName = convertCharPtrToHidlString(resp[1]);
             numeric = convertCharPtrToHidlString(resp[2]);
         }
         Return<void> retStatus = radioService[slotId]->mRadioResponse->getOperatorResponse(
@@ -3984,20 +3979,15 @@ SendSmsResult makeSendSmsResult(RadioResponseInfo& responseInfo, int serial, int
     populateResponseInfo(responseInfo, serial, responseType, e);
     SendSmsResult result = {};
 
-    if (response != NULL && responseLen == sizeof (RIL_SMS_Response)) {
+    if (response == NULL || responseLen != sizeof(RIL_SMS_Response)) {
+        RLOGE("Invalid response: NULL");
+        if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
+        result.ackPDU = hidl_string();
+    } else {
         RIL_SMS_Response *resp = (RIL_SMS_Response *) response;
         result.messageRef = resp->messageRef;
         result.ackPDU = convertCharPtrToHidlString(resp->ackPDU);
         result.errorCode = resp->errorCode;
-    } else if (response != NULL && responseLen == sizeof (RIL_SMS_Response_Ext)) {
-        RIL_SMS_Response *resp = &(((RIL_SMS_Response_Ext *) response)->response);
-        result.messageRef = resp->messageRef;
-        result.ackPDU = convertCharPtrToHidlString(resp->ackPDU);
-        result.errorCode = resp->errorCode;
-    } else {
-        RLOGE("Invalid response: NULL");
-        if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
-        result.ackPDU = hidl_string();
     }
     return result;
 }
@@ -4551,26 +4541,22 @@ int radio::getAvailableNetworksResponse(int slotId,
 #if VDBG
     RLOGD("getAvailableNetworksResponse: serial %d", serial);
 #endif
-    int mqanelements;
-    char value[PROPERTY_VALUE_MAX];
-    property_get("ro.ril.telephony.mqanelements", value, "4");
-	mqanelements = atoi(value);
 
     if (radioService[slotId]->mRadioResponse != NULL) {
         RadioResponseInfo responseInfo = {};
         populateResponseInfo(responseInfo, serial, responseType, e);
         hidl_vec<OperatorInfo> networks;
         if ((response == NULL && responseLen != 0)
-                || responseLen % (mqanelements * sizeof(char *))!= 0) {
+                || responseLen % (4 * sizeof(char *))!= 0) {
             RLOGE("getAvailableNetworksResponse Invalid response: NULL");
             if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
         } else {
             char **resp = (char **) response;
             int numStrings = responseLen / sizeof(char *);
-            networks.resize(numStrings/mqanelements);
-            for (int i = 0, j = 0; i < numStrings; i = i + mqanelements, j++) {
+            networks.resize(numStrings/4);
+            for (int i = 0, j = 0; i < numStrings; i = i + 4, j++) {
                 networks[j].alphaLong = convertCharPtrToHidlString(resp[i]);
-                networks[j].alphaShort = convertCharPtrToHidlString(resp[i]);
+                networks[j].alphaShort = convertCharPtrToHidlString(resp[i + 1]);
                 networks[j].operatorNumeric = convertCharPtrToHidlString(resp[i + 2]);
                 int status = convertOperatorStatusToInt(resp[i + 3]);
                 if (status == -1) {
@@ -7550,7 +7536,6 @@ int radio::cdmaInfoRecInd(int slotId,
         RIL_CDMA_InformationRecords *recordsRil = (RIL_CDMA_InformationRecords *) response;
 
         char* string8 = NULL;
-	int ret = 0;
         int num = MIN(recordsRil->numberOfInfoRecs, RIL_CDMA_MAX_NUMBER_OF_INFO_RECS);
         if (recordsRil->numberOfInfoRecs > RIL_CDMA_MAX_NUMBER_OF_INFO_RECS) {
             RLOGE("cdmaInfoRecInd: received %d recs which is more than %d, dropping "
@@ -7626,17 +7611,6 @@ int radio::cdmaInfoRecInd(int slotId,
                 }
 
                 case RIL_CDMA_SIGNAL_INFO_REC: {
-                if (infoRec->rec.signal.isPresent
-                        /* IS95_CONST_IR_SIGNAL_IS54B */
-                        && infoRec->rec.signal.signalType == 2
-                        /* IS95_CONST_IR_ALERT_MED */
-                        && infoRec->rec.signal.alertPitch == 0
-                        /* IS95_CONST_IR_SIG_IS54B_L */
-                        && infoRec->rec.signal.signal == 1) {
-                    /* Drop the response to workaround the "ring of death" bug */
-                    ret = 1;
-                }
-
                     record->signal.resize(1);
                     record->signal[0].isPresent = infoRec->rec.signal.isPresent;
                     record->signal[0].signalType = infoRec->rec.signal.signalType;
