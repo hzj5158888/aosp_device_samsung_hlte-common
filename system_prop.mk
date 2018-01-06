@@ -64,7 +64,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.data.qmi.adb_logmask=0 \
     persist.radio.add_power_save=1 \
     rild.libpath=/vendor/lib/libsec-ril.so \
-    ro.ril.telephony.mqanelements=6
+    ro.ril.telephony.qan_resp_strings=6
 
 # Sensors
 PRODUCT_PROPERTY_OVERRIDES += \
