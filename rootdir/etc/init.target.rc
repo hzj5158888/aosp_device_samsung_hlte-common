@@ -464,6 +464,8 @@ on boot
     chown nfc nfc /dev/bcm2079x
     mkdir /data/nfc
     mkdir /data/nfc/param
+    mkdir /data/vendor/nfc 0770 nfc nfc
+    mkdir /data/vendor/nfc/param 0770 nfc nfc
     chmod 0700 /data/nfc
     chmod 0700 /data/nfc/param
     chown nfc nfc /data/nfc
@@ -561,9 +563,10 @@ service thermal-engine /vendor/bin/thermal-engine
    group root
 
 service time_daemon /vendor/bin/time_daemon
+   capabilities SYS_TIME
    class main
-   user root
-   group root
+   user system
+   group net_raw
 
 service adsprpcd /system/bin/adsprpcd
    class main

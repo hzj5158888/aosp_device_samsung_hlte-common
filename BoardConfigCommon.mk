@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2016 The CyanogenMod Project
-# Copyright (C) 2017 The LineageOS Project
+# Copyright (C) 2017-2018 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ TARGET_BOOTIMG_SIGNED := true
 # Binder API version
 TARGET_USES_64_BIT_BINDER := true
 
+# Legacy ADB
+TARGET_USES_LEGACY_ADB_INTERFACE := true
+
 # krait
 TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 TARGET_USE_KRAIT_PLD_SET := true
@@ -42,7 +45,7 @@ BOARD_CUSTOM_BOOTIMG_MK := hardware/samsung/mkbootimg.mk
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_CMDLINE := console=null androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x3F androidboot.bootdevice=msm_sdcc.1
 BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
-BOARD_KERNEL_IMAGE_NAME := zImage-dtb
+BOARD_KERNEL_IMAGE_NAME := zImage
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02900000 --tags_offset 0x02700000
@@ -58,11 +61,14 @@ TARGET_COMPILE_WITH_MSM_KERNEL := true
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
 
 # Audio
-TARGET_QCOM_AUDIO_VARIANT := caf-msm8974
+#TARGET_QCOM_AUDIO_VARIANT := caf-msm8974
 QCOM_CSDCLIENT_ENABLED := false
+AUDIO_FEATURE_ENABLED_COMPRESS_VOIP := false
 AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
 AUDIO_FEATURE_ENABLED_HWDEP_CAL := true
 AUDIO_FEATURE_ENABLED_LOW_LATENCY_CAPTURE := true
+USE_CUSTOM_AUDIO_POLICY := 0
+USE_XML_AUDIO_POLICY_CONF := 1
 
 # Bluetooth
 BOARD_CUSTOM_BT_CONFIG := $(COMMON_PATH)/bluetooth/vnd_hlte.txt
@@ -78,16 +84,6 @@ USE_DEVICE_SPECIFIC_CAMERA := true
 
 # Crypto
 TARGET_HW_DISK_ENCRYPTION := false
-
-# Dexpreopt
-ifeq ($(HOST_OS),linux)
-  ifneq ($(TARGET_BUILD_VARIANT),eng)
-    ifeq ($(WITH_DEXPREOPT),)
-      WITH_DEXPREOPT := true
-      WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY := true
-    endif
-  endif
-endif
 
 # Fonts
 EXTENDED_FONT_FOOTPRINT := true
@@ -127,6 +123,7 @@ TARGET_KEYMASTER_WAIT_FOR_QSEE := true
 
 # Radio
 BOARD_PROVIDES_LIBRIL := true
+TARGET_RIL_VARIANT := caf
 
 # Recovery
 BOARD_HAS_LARGE_FILESYSTEM := true
@@ -154,13 +151,13 @@ BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
 WPA_SUPPLICANT_VERSION := VER_0_8_X
 WIFI_BAND := 802_11_ABG
-WIFI_DRIVER_MODULE_ARG      := "firmware_path=/system/etc/wifi/bcmdhd_sta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
-WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
+WIFI_DRIVER_MODULE_ARG      := "firmware_path=/vendor/etc/wifi/bcmdhd_sta.bin nvram_path=/vendor/etc/wifi/nvram_net.txt"
+WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/vendor/etc/wifi/bcmdhd_apsta.bin nvram_path=/vendor/etc/wifi/nvram_net.txt"
 WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/dhd/parameters/firmware_path"
-WIFI_DRIVER_FW_PATH_STA     := "/system/etc/wifi/bcmdhd_sta.bin"
-WIFI_DRIVER_FW_PATH_AP      := "/system/etc/wifi/bcmdhd_apsta.bin"
+WIFI_DRIVER_FW_PATH_STA     := "/vendor/etc/wifi/bcmdhd_sta.bin"
+WIFI_DRIVER_FW_PATH_AP      := "/vendor/etc/wifi/bcmdhd_apsta.bin"
 WIFI_DRIVER_NVRAM_PATH_PARAM:= "/sys/module/dhd/parameters/nvram_path"
-WIFI_DRIVER_NVRAM_PATH      := "/system/etc/wifi/nvram_net.txt"
+WIFI_DRIVER_NVRAM_PATH      := "/vendor/etc/wifi/nvram_net.txt"
 
 # Enable Minikin text layout engine (will be the default soon)
 USE_MINIKIN := true

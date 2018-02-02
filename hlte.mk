@@ -21,7 +21,9 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 $(call inherit-product-if-exists, vendor/samsung/hlte-common/hlte-common-vendor.mk)
 
 # Overlays
-DEVICE_PACKAGE_OVERLAYS += device/samsung/hlte-common/overlay
+DEVICE_PACKAGE_OVERLAYS += \
+    device/samsung/hlte-common/overlay \
+    device/samsung/hlte-common/overlay-lineage
 
 # MSM8974
 TARGET_BOARD_PLATFORM := msm8974
@@ -78,11 +80,20 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.nfc.xml \
     frameworks/native/data/etc/android.hardware.nfc.hce.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.nfc.hce.xml
 
+# AV Audio
+USE_XML_AUDIO_POLICY_CONF := 1
+PRODUCT_COPY_FILES += \
+    frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/a2dp_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usb_audio_policy_configuration.xml \
+    frameworks/av/services/audiopolicy/config/default_volume_tables.xml:$(TARGET_COPY_OUT_VENDOR)/etc/default_volume_tables.xml \
+    frameworks/av/services/audiopolicy/config/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_volumes.xml
+
 # Audio
 PRODUCT_COPY_FILES += \
     device/samsung/hlte-common/audio/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml \
     device/samsung/hlte-common/audio/audio_platform_info.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_platform_info.xml \
-    device/samsung/hlte-common/audio/audio_policy.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy.conf \
+    device/samsung/hlte-common/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_configuration.xml \
     device/samsung/hlte-common/audio/mixer_paths.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths.xml
 
 # ANT+
@@ -103,10 +114,7 @@ PRODUCT_PACKAGES += \
     CellBroadcastReceiver \
     AccountAndSyncSettings
 
-# GPS
-PRODUCT_PACKAGES += \
-    gps.msm8974
-
+# Gps Config
 PRODUCT_COPY_FILES += \
     device/samsung/hlte-common/configs/flp.conf:system/etc/flp.conf \
     device/samsung/hlte-common/configs/gps.conf:system/etc/gps.conf \
@@ -130,7 +138,7 @@ PRODUCT_PACKAGES += \
 
 # Camera SHIM
 PRODUCT_PACKAGES += \
-    libcamera_parameters_shim
+    libshim_camera
 
 # Camera HIDL interfaces
 PRODUCT_PACKAGES += \
@@ -195,7 +203,8 @@ PRODUCT_PACKAGES += \
 
 # Health HIDL
 PRODUCT_PACKAGES += \
-   android.hardware.health@1.0-impl
+   android.hardware.health@1.0-impl \
+   android.hardware.health@1.0-service
 
 # Keystore
 PRODUCT_PACKAGES += \
@@ -288,7 +297,7 @@ PRODUCT_PACKAGES += \
     android.hardware.vibrator@1.0-impl \
     android.hardware.vibrator@1.0-service
 
-#GNSS HAL
+# GNSS HAL
 PRODUCT_PACKAGES += \
     libgnss \
     android.hardware.gnss@1.0-impl \

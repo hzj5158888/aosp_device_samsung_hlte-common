@@ -25,18 +25,11 @@ LOCAL_PROPRIETARY_MODULE := true
 
 include $(BUILD_SHARED_LIBRARY)
 
-# libcamera_parameters_shim
-
 include $(CLEAR_VARS)
-
-LOCAL_SRC_FILES := \
-    CameraParameters.cpp
-
-LOCAL_MODULE := libcamera_parameters_shim
-LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+LOCAL_SRC_FILES := camera_shim.c
+LOCAL_MODULE := libshim_camera
 LOCAL_MODULE_TAGS := optional
-
-LOCAL_32_BIT_ONLY := true
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 include $(BUILD_SHARED_LIBRARY)
 
 endif

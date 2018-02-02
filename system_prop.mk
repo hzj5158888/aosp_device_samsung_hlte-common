@@ -3,16 +3,12 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.dex2oat-swap=false \
     dalvik.vm.heapminfree=2m
 
-# Default OMX service to non-Treble
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.media.treble_omx=false
-
 # Media
 PRODUCT_PROPERTY_OVERRIDES += \
     media.stagefright.legacyencoder=true \
     media.stagefright.less-secure=true
 
-# Keymast
+# Keymaster
 PRODUCT_PROPERTY_OVERRIDES += \
     sys.keymaster.loaded=true
 

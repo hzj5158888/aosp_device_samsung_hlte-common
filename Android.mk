@@ -20,9 +20,7 @@ ifneq ($(filter hlte hltetmo hltespr hlteusc hltevzw,$(TARGET_DEVICE)),)
 include $(call all-subdir-makefiles,$(LOCAL_PATH))
 
 display-hal := hardware/qcom/display/msm8994
-media-hal := hardware/qcom/media/msm8974
 
 include $(display-hal)/Android.mk
-include $(call all-makefiles-under,$(media-hal))
 
 endif
